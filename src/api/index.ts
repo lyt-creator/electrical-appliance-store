@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { Category, Product, LoginRequest, LoginResponse, CategoryRequest, ProductRequest } from '../types'
 
+// Use Railway backend API URL when deployed on Vercel, fallback to /api for local dev
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
 
 const instance = axios.create({
@@ -43,4 +44,13 @@ export const uploadAPI = {
     formData.append('image', file)
     return instance.post<{ url: string }>('/upload', formData)
   },
+}
+
+// Helper to resolve image URLs (uploads are served from the backend)
+export const resolveImageUrl = (url: string | undefined): string | undefined => {
+  if (!url) return undefined
+  if (url.startsWith('http://') || url.startsWith('https://')) return url
+  // Relative path like /uploads/xxx.jpg -> prepend backend URL
+  const baseUrl = API_BASE_URL.replace('/api', '')
+  return `${baseUrl}${url}`
 }

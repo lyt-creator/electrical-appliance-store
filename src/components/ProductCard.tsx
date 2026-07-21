@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Product } from '../types'
+import { resolveImageUrl } from '../api'
 
 interface ProductCardProps {
   product: Product
@@ -8,7 +9,7 @@ interface ProductCardProps {
 
 export const ProductCard = ({ product }: ProductCardProps) => {
   const [imgError, setImgError] = useState(false)
-  const firstImage = product.images[0] || '/placeholder.png'
+  const firstImage = resolveImageUrl(product.images[0]) || '/placeholder.png'
 
   return (
     <Link

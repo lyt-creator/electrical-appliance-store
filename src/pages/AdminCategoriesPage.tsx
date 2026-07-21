@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Plus, Edit2, Trash2, X, ImagePlus } from 'lucide-react'
 import { categoryAPI, uploadAPI } from '../api'
+import { resolveImageUrl } from '../api'
 import { Category, CategoryRequest } from '../types'
 
 export const AdminCategoriesPage = () => {
@@ -132,7 +133,7 @@ export const AdminCategoriesPage = () => {
                     <td className="px-6 py-4 text-sm text-gray-500">{category.id}</td>
                     <td className="px-6 py-4">
                       {category.logo ? (
-                        <img src={category.logo} alt={category.name} className="w-10 h-10 object-contain rounded-lg" />
+                        <img src={resolveImageUrl(category.logo)} alt={category.name} className="w-10 h-10 object-contain rounded-lg" />
                       ) : (
                         <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
                           <span className="text-gray-400 text-xs">无</span>
@@ -171,7 +172,7 @@ export const AdminCategoriesPage = () => {
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center space-x-3">
                     {category.logo ? (
-                      <img src={category.logo} alt={category.name} className="w-12 h-12 object-contain rounded-lg border border-gray-200" />
+                      <img src={resolveImageUrl(category.logo)} alt={category.name} className="w-12 h-12 object-contain rounded-lg border border-gray-200" />
                     ) : (
                       <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
                         <span className="text-gray-400 text-xs">无</span>
@@ -222,7 +223,7 @@ export const AdminCategoriesPage = () => {
                 <div className="flex items-center space-x-4">
                   {formData.logo ? (
                     <div className="relative">
-                      <img src={formData.logo} alt="Logo" className="w-20 h-20 object-contain rounded-lg border border-gray-200" />
+                      <img src={resolveImageUrl(formData.logo)} alt="Logo" className="w-20 h-20 object-contain rounded-lg border border-gray-200" />
                       <button
                         type="button"
                         onClick={handleRemoveLogo}

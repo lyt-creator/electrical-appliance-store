@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { X } from 'lucide-react'
+import { resolveImageUrl } from '../api'
 
 interface ImageGalleryProps {
   images: string[]
@@ -122,7 +123,7 @@ export const ImageGallery = ({ images, productName }: ImageGalleryProps) => {
             onClick={openLightbox}
           >
             <img
-              src={image}
+              src={resolveImageUrl(image)}
               alt={`${productName} - ${index + 1}`}
               className="w-full h-full object-contain"
               draggable={false}
@@ -186,7 +187,7 @@ export const ImageGallery = ({ images, productName }: ImageGalleryProps) => {
                 }}
               >
                 <img
-                  src={image}
+                  src={resolveImageUrl(image)}
                   alt={`${productName} - ${index + 1}`}
                   className="max-w-full max-h-screen object-contain"
                   draggable={false}

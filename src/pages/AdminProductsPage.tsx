@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Plus, Edit2, Trash2, X, ImagePlus } from 'lucide-react'
 import { productAPI, categoryAPI, uploadAPI } from '../api'
+import { resolveImageUrl } from '../api'
 import { Product, ProductRequest, Category } from '../types'
 
 export const AdminProductsPage = () => {
@@ -202,7 +203,7 @@ export const AdminProductsPage = () => {
                   </div>
                   {product.images[0] && (
                     <img
-                      src={product.images[0]}
+                      src={resolveImageUrl(product.images[0])}
                       alt={product.name}
                       className="w-16 h-16 object-cover rounded-lg ml-3 flex-shrink-0"
                     />
@@ -305,7 +306,7 @@ export const AdminProductsPage = () => {
                 <div className="flex flex-wrap gap-3">
                   {formData.images.map((image, index) => (
                     <div key={index} className="relative">
-                      <img src={image} alt={`图片 ${index + 1}`} className="w-20 h-20 object-cover rounded-lg" />
+                      <img src={resolveImageUrl(image)} alt={`图片 ${index + 1}`} className="w-20 h-20 object-cover rounded-lg" />
                       <button
                         type="button"
                         onClick={() => handleRemoveImage(index)}

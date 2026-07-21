@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Category } from '../types'
+import { resolveImageUrl } from '../api'
 
 interface CategoryCardProps {
   category: Category
@@ -20,7 +21,7 @@ export const CategoryCard = ({ category }: CategoryCardProps) => {
         <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors p-2 overflow-hidden">
           {showLogo ? (
             <img
-              src={category.logo}
+              src={resolveImageUrl(category.logo)}
               alt={category.name}
               className="w-full h-full object-contain"
               onError={() => setLogoError(true)}

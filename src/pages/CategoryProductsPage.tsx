@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { categoryAPI, productAPI } from '../api'
+import { resolveImageUrl } from '../api'
 import { Category, Product } from '../types'
 import { ProductCard } from '../components/ProductCard'
 
@@ -50,7 +51,7 @@ export const CategoryProductsPage = () => {
             <div className="flex items-center space-x-6">
               <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center">
                 {category.logo && !logoError ? (
-                  <img src={category.logo} alt={category.name} className="w-16 h-16 object-contain" onError={() => setLogoError(true)} />
+                  <img src={resolveImageUrl(category.logo)} alt={category.name} className="w-16 h-16 object-contain" onError={() => setLogoError(true)} />
                 ) : (
                   <span className="text-4xl font-bold text-primary">{category.name.charAt(0)}</span>
                 )}
