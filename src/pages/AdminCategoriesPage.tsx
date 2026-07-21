@@ -49,7 +49,6 @@ export const AdminCategoriesPage = () => {
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-
     try {
       const res = await uploadAPI.image(file)
       setFormData({ ...formData, logo: res.data.url })
@@ -92,96 +91,124 @@ export const AdminCategoriesPage = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-dark">分类管理</h1>
-          <p className="text-gray-500 mt-1">管理产品分类</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-dark">分类管理</h1>
+          <p className="text-gray-500 mt-1 text-sm">管理产品分类</p>
         </div>
         <button
           onClick={() => handleOpenModal()}
-          className="flex items-center space-x-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
+          className="flex items-center space-x-1 sm:space-x-2 bg-primary text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors text-sm sm:text-base"
         >
           <Plus className="w-5 h-5" />
           <span>添加分类</span>
         </button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">ID</th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Logo</th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">名称</th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">描述</th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">创建时间</th>
-              <th className="px-6 py-3 text-right text-sm font-semibold text-gray-600">操作</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {loading ? (
-              <tr>
-                <td colSpan={6} className="px-6 py-20 text-center">
-                  <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-                </td>
-              </tr>
-            ) : categories.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-6 py-20 text-center text-gray-500">
-                  暂无分类
-                </td>
-              </tr>
-            ) : (
-              categories.map((category) => (
-                <tr key={category.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm text-gray-500">{category.id}</td>
-                  <td className="px-6 py-4">
+      {loading ? (
+        <div className="bg-white rounded-xl shadow-sm p-20 text-center">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+        </div>
+      ) : categories.length === 0 ? (
+        <div className="bg-white rounded-xl shadow-sm p-20 text-center text-gray-500">
+          暂无分类
+        </div>
+      ) : (
+        <>
+          {/* Desktop: Table */}
+          <div className="hidden md:block bg-white rounded-xl shadow-sm overflow-hidden">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">ID</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Logo</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">名称</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">描述</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">创建时间</th>
+                  <th className="px-6 py-3 text-right text-sm font-semibold text-gray-600">操作</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {categories.map((category) => (
+                  <tr key={category.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 text-sm text-gray-500">{category.id}</td>
+                    <td className="px-6 py-4">
+                      {category.logo ? (
+                        <img src={category.logo} alt={category.name} className="w-10 h-10 object-contain rounded-lg" />
+                      ) : (
+                        <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                          <span className="text-gray-400 text-xs">无</span>
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="font-medium text-dark">{category.name}</span>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+                      {category.description}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-500">
+                      {new Date(category.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end space-x-2">
+                        <button onClick={() => handleOpenModal(category)} className="text-gray-500 hover:text-primary transition-colors">
+                          <Edit2 className="w-5 h-5" />
+                        </button>
+                        <button onClick={() => handleDelete(category.id)} className="text-gray-500 hover:text-red-500 transition-colors">
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile: Cards */}
+          <div className="md:hidden space-y-3">
+            {categories.map((category) => (
+              <div key={category.id} className="bg-white rounded-xl shadow-sm p-4">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center space-x-3">
                     {category.logo ? (
-                      <img 
-                        src={category.logo} 
-                        alt={category.name} 
-                        className="w-10 h-10 object-contain rounded-lg"
-                      />
+                      <img src={category.logo} alt={category.name} className="w-12 h-12 object-contain rounded-lg border border-gray-200" />
                     ) : (
-                      <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
                         <span className="text-gray-400 text-xs">无</span>
                       </div>
                     )}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="font-medium text-dark">{category.name}</span>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
-                    {category.description}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    {new Date(category.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end space-x-2">
-                      <button
-                        onClick={() => handleOpenModal(category)}
-                        className="text-gray-500 hover:text-primary transition-colors"
-                      >
-                        <Edit2 className="w-5 h-5" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(category.id)}
-                        className="text-gray-500 hover:text-red-500 transition-colors"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
+                    <div>
+                      <span className="font-bold text-dark text-lg">{category.name}</span>
+                      <span className="text-xs text-gray-400 ml-2">ID: {category.id}</span>
                     </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-500 mb-2 leading-relaxed">{category.description}</p>
+                <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                  <span className="text-xs text-gray-400">
+                    {new Date(category.createdAt).toLocaleDateString()}
+                  </span>
+                  <div className="flex items-center space-x-3">
+                    <button onClick={() => handleOpenModal(category)} className="flex items-center space-x-1 text-primary text-sm">
+                      <Edit2 className="w-4 h-4" />
+                      <span>编辑</span>
+                    </button>
+                    <button onClick={() => handleDelete(category.id)} className="flex items-center space-x-1 text-red-500 text-sm">
+                      <Trash2 className="w-4 h-4" />
+                      <span>删除</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
 
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl w-full max-w-md">
-            <div className="flex items-center justify-between p-6 border-b">
+          <div className="bg-white rounded-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-6 border-b sticky top-0 bg-white z-10">
               <h2 className="text-xl font-semibold text-dark">
                 {editingCategory ? '编辑分类' : '添加分类'}
               </h2>
@@ -195,11 +222,7 @@ export const AdminCategoriesPage = () => {
                 <div className="flex items-center space-x-4">
                   {formData.logo ? (
                     <div className="relative">
-                      <img 
-                        src={formData.logo} 
-                        alt="Logo" 
-                        className="w-20 h-20 object-contain rounded-lg border border-gray-200"
-                      />
+                      <img src={formData.logo} alt="Logo" className="w-20 h-20 object-contain rounded-lg border border-gray-200" />
                       <button
                         type="button"
                         onClick={handleRemoveLogo}

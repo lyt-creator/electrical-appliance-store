@@ -10,6 +10,7 @@ export const CategoryProductsPage = () => {
   const [category, setCategory] = useState<Category | null>(null)
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
+  const [logoError, setLogoError] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,8 +49,8 @@ export const CategoryProductsPage = () => {
           <div className="bg-white rounded-xl p-8 mb-8 shadow-sm">
             <div className="flex items-center space-x-6">
               <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center">
-                {category.logo ? (
-                  <img src={category.logo} alt={category.name} className="w-16 h-16 object-contain" />
+                {category.logo && !logoError ? (
+                  <img src={category.logo} alt={category.name} className="w-16 h-16 object-contain" onError={() => setLogoError(true)} />
                 ) : (
                   <span className="text-4xl font-bold text-primary">{category.name.charAt(0)}</span>
                 )}

@@ -4,8 +4,8 @@ node_modules/
 # Build output
 dist/
 
-# Uploads (runtime data)
-api/uploads/
+# Uploads (include in deployment for product images)
+# api/uploads/
 
 # Environment variables
 .env
