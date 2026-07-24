@@ -56,3 +56,14 @@ export const resolveImageUrl = (url: string | undefined): string | undefined => 
   const baseUrl = API_BASE_URL.replace('/api', '')
   return `${baseUrl}${url}`
 }
+
+// Helper to get the shareable site URL
+// In production (VITE_API_URL is a full URL), use that domain for reliability
+// In local dev (VITE_API_URL is '/api'), fall back to window.location.origin
+export const getShareableUrl = (path: string): string => {
+  if (API_BASE_URL.startsWith('http://') || API_BASE_URL.startsWith('https://')) {
+    const baseUrl = API_BASE_URL.replace(/\/api$/, '')
+    return `${baseUrl}${path}`
+  }
+  return `${window.location.origin}${path}`
+}

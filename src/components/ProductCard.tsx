@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Share2, Check } from 'lucide-react'
 import { Product } from '../types'
-import { resolveImageUrl } from '../api'
+import { resolveImageUrl, getShareableUrl } from '../api'
 
 interface ProductCardProps {
   product: Product
@@ -16,7 +16,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
   const handleShare = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    const shareUrl = `${window.location.origin}/products/${product.id}`
+    const shareUrl = getShareableUrl(`/products/${product.id}`)
     try {
       await navigator.clipboard.writeText(shareUrl)
     } catch {

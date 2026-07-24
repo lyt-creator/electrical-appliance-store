@@ -6,7 +6,7 @@ import { Product, Category } from '../types'
 import { ImageGallery } from '../components/ImageGallery'
 import { ImageCarousel } from '../components/ImageCarousel'
 import { ProductCard } from '../components/ProductCard'
-import { resolveImageUrl } from '../api'
+import { resolveImageUrl, getShareableUrl } from '../api'
 
 export const ProductDetailPage = () => {
   const { id } = useParams<{ id: string }>()
@@ -17,7 +17,7 @@ export const ProductDetailPage = () => {
   const [showSharePanel, setShowSharePanel] = useState(false)
   const [copied, setCopied] = useState(false)
 
-  const shareUrl = product ? `${window.location.origin}/products/${product.id}` : ''
+  const shareUrl = product ? getShareableUrl(`/products/${product.id}`) : ''
   const shareText = product ? `${product.name} - ¥${product.price.toFixed(2)} | 电器商城` : ''
 
   const handleCopyLink = async () => {
