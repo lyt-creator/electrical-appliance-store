@@ -271,6 +271,60 @@ app.get('/api/search', async (req, res) => {
   }
 });
 
+// ===== Customer Messages API =====
+// Public: submit a message (no auth required)
+app.post('/api/messages', async (req, res) => {
+  const { name, contact, content, productId, productName } = req.body;
+  if (!content || !content.trim()) {
+    return res.status(400).json({ error: '留言内容不能为空' });
+  }
+  try {
+    const message = await db.messages.create({
+      name: (name || '').trim() || '匿名用户',
+      contact: (contact || '').trim() || null,
+      content: content.trim(),
+      productId: productId || null,
+      productName: productName || null,
+    });
+    res.status(201).json(message);
+  } catch (error) {
+    res.status(500).json({ error: '提交留言失败: ' + error.message });
+  }
+});
+
+// Admin: get all messages
+app.get('/api/messages', authMiddleware, async (req, res) => {
+  try {
+    const messages = await db.messages.getAll();
+    res.json(messages);
+  } catch (error) {
+    res.status(500).json({ error: '获取留言失败: ' + error.message });
+  }
+});
+
+// Admin: mark message as read
+app.put('/api/messages/:id/read', authMiddleware, async (req, res) => {
+  const id = parseInt(req.params.id);
+  try {
+    const message = await db.messages.markAsRead(id);
+    if (!message) return res.status(404).json({ error: '留言不存在' });
+    res.json(message);
+  } catch (error) {
+    res.status(500).json({ error: '操作失败: ' + error.message });
+  }
+});
+
+// Admin: delete a message
+app.delete('/api/messages/:id', authMiddleware, async (req, res) => {
+  const id = parseInt(req.params.id);
+  try {
+    await db.messages.delete(id);
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ error: '删除留言失败: ' + error.message });
+  }
+});
+
 app.post('/api/upload', authMiddleware, upload.single('image'), (req, res) => {
   try {
     if (!req.file) {

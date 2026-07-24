@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Outlet, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Grid3X3, Package, LogOut, Menu, X, Home } from 'lucide-react'
+import { LayoutDashboard, Grid3X3, Package, LogOut, Menu, X, Home, MessageSquare } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 
 export const AdminLayout = () => {
@@ -36,6 +36,7 @@ export const AdminLayout = () => {
     { icon: LayoutDashboard, label: '控制台', path: '/admin/dashboard' },
     { icon: Grid3X3, label: '分类管理', path: '/admin/categories' },
     { icon: Package, label: '产品管理', path: '/admin/products' },
+    { icon: MessageSquare, label: '留言管理', path: '/admin/messages' },
   ]
 
   // On desktop: sidebar is always visible (static), no overlay

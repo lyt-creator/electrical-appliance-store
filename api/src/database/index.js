@@ -104,8 +104,10 @@ const persisted = loadData();
 let categories = persisted?.categories || [...defaultCategories];
 let products = persisted?.products || [...defaultProducts];
 let admins = persisted?.admins || [...defaultAdmins];
+let messages = persisted?.messages || [];
 let categoryIdCounter = persisted?.categoryIdCounter || 10;
 let productIdCounter = persisted?.productIdCounter || 5;
+let messageIdCounter = persisted?.messageIdCounter || 1;
 
 // Save data to file (called after every mutation)
 let saveTimeout = null;
@@ -114,7 +116,7 @@ function persist() {
   if (saveTimeout) clearTimeout(saveTimeout);
   saveTimeout = setTimeout(() => {
     try {
-      const data = { categories, products, admins, categoryIdCounter, productIdCounter };
+      const data = { categories, products, admins, messages, categoryIdCounter, productIdCounter, messageIdCounter };
       fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf-8');
       console.log('[DB] Data persisted to', DATA_FILE);
     } catch (err) {
@@ -126,7 +128,7 @@ function persist() {
 // Save immediately (used on shutdown)
 function persistSync() {
   try {
-    const data = { categories, products, admins, categoryIdCounter, productIdCounter };
+    const data = { categories, products, admins, messages, categoryIdCounter, productIdCounter, messageIdCounter };
     fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf-8');
     console.log('[DB] Data persisted (sync) to', DATA_FILE);
   } catch (err) {
@@ -234,6 +236,38 @@ const db = {
   admin: {
     getByUsername: async (username) => {
       return admins.find(a => a.username === username) || null;
+    },
+  },
+  messages: {
+    getAll: async () => {
+      return [...messages].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    },
+    create: async (data) => {
+      const message = {
+        id: messageIdCounter++,
+        name: data.name || '匿名用户',
+        contact: data.contact || null,
+        content: data.content,
+        productId: data.productId || null,
+        productName: data.productName || null,
+        isRead: false,
+        createdAt: new Date().toISOString(),
+      };
+      messages.push(message);
+      persist();
+      return message;
+    },
+    markAsRead: async (id) => {
+      const idx = messages.findIndex(m => m.id === id);
+      if (idx === -1) return null;
+      messages[idx] = { ...messages[idx], isRead: true };
+      persist();
+      return messages[idx];
+    },
+    delete: async (id) => {
+      const idx = messages.findIndex(m => m.id === id);
+      if (idx !== -1) messages.splice(idx, 1);
+      persist();
     },
   },
 };

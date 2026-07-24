@@ -51,3 +51,22 @@ export interface ProductRequest {
   detailImages?: string[]
   specs?: string
 }
+
+export interface Message {
+  id: number
+  name: string
+  contact: string | null
+  content: string
+  productId: number | null
+  productName: string | null
+  isRead: boolean
+  createdAt: string
+}
+
+export interface MessageRequest {
+  name?: string
+  contact?: string
+  content: string
+  productId?: number
+  productName?: string
+}

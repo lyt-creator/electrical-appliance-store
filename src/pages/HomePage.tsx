@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronRight, Sparkles } from 'lucide-react'
+import { ChevronRight, Sparkles, MessageSquare } from 'lucide-react'
 import { categoryAPI, productAPI } from '../api'
 import { Category, Product } from '../types'
 import { CategoryCard } from '../components/CategoryCard'
 import { ProductCard } from '../components/ProductCard'
 import { SearchBar } from '../components/SearchBar'
+import { MessageModal } from '../components/MessageModal'
 
 export const HomePage = () => {
   const [categories, setCategories] = useState<Category[]>([])
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
+  const [showMessage, setShowMessage] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -174,6 +176,43 @@ export const HomePage = () => {
           </div>
         </div>
       </section>
+
+      {/* Customer message CTA section */}
+      <section className="py-8 bg-white animate-fade-in-up">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="bg-gradient-to-br from-primary-50 to-secondary-50/40 rounded-3xl p-6 md:p-8 border border-primary-100/50">
+            <div className="w-14 h-14 bg-primary-700 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-soft">
+              <MessageSquare className="w-7 h-7 text-white" />
+            </div>
+            <h2 className="text-lg md:text-xl font-bold text-dark mb-2 tracking-tight">有任何问题？欢迎留言</h2>
+            <p className="text-sm text-gray-500 mb-4 leading-relaxed">
+              如果您对产品有任何疑问或需要咨询，欢迎给我们留言，我们会第一时间为您解答
+            </p>
+            <button
+              onClick={() => setShowMessage(true)}
+              className="inline-flex items-center space-x-2 bg-primary-700 text-white px-6 py-2.5 rounded-xl font-semibold text-sm hover:bg-primary-800 transition-all shadow-soft hover:shadow-card-hover"
+            >
+              <MessageSquare className="w-4 h-4" />
+              <span>立即留言</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Floating message button */}
+      <button
+        onClick={() => setShowMessage(true)}
+        className="fixed bottom-6 right-4 sm:right-6 z-40 w-12 h-12 sm:w-14 sm:h-14 bg-primary-700 text-white rounded-full shadow-card-hover hover:bg-primary-800 hover:scale-105 transition-all flex items-center justify-center group"
+        title="给我们留言"
+      >
+        <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6" />
+        <span className="absolute right-full mr-3 bg-dark text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+          给我们留言
+        </span>
+      </button>
+
+      {/* Message modal */}
+      <MessageModal isOpen={showMessage} onClose={() => setShowMessage(false)} />
     </div>
   )
 }

@@ -13,6 +13,7 @@ import { AdminLoginPage } from './pages/AdminLoginPage'
 import { AdminDashboardPage } from './pages/AdminDashboardPage'
 import { AdminCategoriesPage } from './pages/AdminCategoriesPage'
 import { AdminProductsPage } from './pages/AdminProductsPage'
+import { AdminMessagesPage } from './pages/AdminMessagesPage'
 import { useAuthStore } from './store/authStore'
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -51,6 +52,7 @@ function App() {
             <Route path="dashboard" element={<AdminDashboardPage />} />
             <Route path="categories" element={<AdminCategoriesPage />} />
             <Route path="products" element={<AdminProductsPage />} />
+            <Route path="messages" element={<AdminMessagesPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>

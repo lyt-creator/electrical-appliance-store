@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft, Share2, Copy, Check, X } from 'lucide-react'
+import { ArrowLeft, Share2, Copy, Check, X, MessageSquare } from 'lucide-react'
 import { productAPI, categoryAPI } from '../api'
 import { Product, Category } from '../types'
 import { ImageGallery } from '../components/ImageGallery'
 import { ImageCarousel } from '../components/ImageCarousel'
 import { ProductCard } from '../components/ProductCard'
+import { MessageModal } from '../components/MessageModal'
 import { resolveImageUrl, getShareableUrl } from '../api'
 
 export const ProductDetailPage = () => {
@@ -16,6 +17,7 @@ export const ProductDetailPage = () => {
   const [loading, setLoading] = useState(true)
   const [showSharePanel, setShowSharePanel] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [showMessage, setShowMessage] = useState(false)
 
   const shareUrl = product ? getShareableUrl(`/products/${product.id}`) : ''
   const shareText = product ? `${product.name} - ¥${product.price.toFixed(2)} | 电器商城` : ''
@@ -136,13 +138,22 @@ export const ProductDetailPage = () => {
             <ArrowLeft className="w-5 h-5" />
             <span className="text-sm">返回</span>
           </Link>
-          <button
-            onClick={() => setShowSharePanel(true)}
-            className="flex items-center space-x-1.5 rounded-full p-2 hover:bg-gray-50 text-gray-600 hover:text-primary-700 transition-colors"
-          >
-            <Share2 className="w-5 h-5" />
-            <span className="text-sm">分享</span>
-          </button>
+          <div className="flex items-center space-x-1">
+            <button
+              onClick={() => setShowMessage(true)}
+              className="flex items-center space-x-1.5 rounded-full p-2 hover:bg-gray-50 text-gray-600 hover:text-primary-700 transition-colors"
+            >
+              <MessageSquare className="w-5 h-5" />
+              <span className="text-sm">留言</span>
+            </button>
+            <button
+              onClick={() => setShowSharePanel(true)}
+              className="flex items-center space-x-1.5 rounded-full p-2 hover:bg-gray-50 text-gray-600 hover:text-primary-700 transition-colors"
+            >
+              <Share2 className="w-5 h-5" />
+              <span className="text-sm">分享</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -251,8 +262,17 @@ export const ProductDetailPage = () => {
             <h1 className="text-lg font-bold text-dark leading-tight tracking-tight">{product.name}</h1>
           </div>
 
-          <div className="flex items-baseline space-x-2">
-            <span className="text-secondary-500 font-bold text-2xl">¥{product.price.toFixed(2)}</span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-baseline space-x-2">
+              <span className="text-secondary-500 font-bold text-2xl">¥{product.price.toFixed(2)}</span>
+            </div>
+            <button
+              onClick={() => setShowMessage(true)}
+              className="flex items-center space-x-1.5 bg-primary-700 text-white px-4 py-2 rounded-xl font-medium text-sm hover:bg-primary-800 transition-colors"
+            >
+              <MessageSquare className="w-4 h-4" />
+              <span>留言咨询</span>
+            </button>
           </div>
         </div>
 
@@ -332,6 +352,14 @@ export const ProductDetailPage = () => {
 
         <div className="h-6" />
       </div>
+
+      {/* Message modal */}
+      <MessageModal
+        isOpen={showMessage}
+        onClose={() => setShowMessage(false)}
+        productId={product.id}
+        productName={product.name}
+      />
     </div>
   )
 }
