@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Lock, Eye, EyeOff } from 'lucide-react'
 import { adminAPI } from '../api'
@@ -15,9 +15,18 @@ export const AdminLoginPage = () => {
   const login = useAuthStore((state) => state.login)
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn)
 
-  if (isLoggedIn && location.pathname === '/admin') {
-    navigate('/admin/dashboard')
-    return null
+  useEffect(() => {
+    if (isLoggedIn && location.pathname === '/admin') {
+      navigate('/admin/dashboard', { replace: true })
+    }
+  }, [isLoggedIn, location.pathname, navigate])
+
+  if (isLoggedIn) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,10 +46,10 @@ export const AdminLoginPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary to-secondary flex items-center justify-center py-12 px-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
-        <div className="bg-gradient-to-r from-primary to-primary/80 p-6 text-center">
-          <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 flex items-center justify-center py-12 px-4">
+      <div className="bg-white rounded-2xl shadow-elevated w-full max-w-md overflow-hidden animate-fade-in-up">
+        <div className="bg-primary-800 p-6 text-center">
+          <div className="w-16 h-16 bg-primary-50 rounded-full flex items-center justify-center mx-auto mb-4">
             <Lock className="w-8 h-8 text-primary" />
           </div>
           <h1 className="text-2xl font-bold text-white">管理员登录</h1>
@@ -55,7 +64,7 @@ export const AdminLoginPage = () => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="请输入用户名"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition-all"
               required
             />
           </div>
@@ -68,7 +77,7 @@ export const AdminLoginPage = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="请输入密码"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all pr-12"
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition-all pr-12"
                 required
               />
               <button
@@ -90,20 +99,11 @@ export const AdminLoginPage = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-primary-700 text-white py-3 rounded-xl font-semibold shadow-soft hover:bg-primary-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? '登录中...' : '登录'}
           </button>
         </form>
-
-        <div className="px-6 pb-6 text-center">
-          <p className="text-sm text-gray-500">
-            默认账号: <span className="font-mono">admin</span>
-          </p>
-          <p className="text-sm text-gray-500">
-            默认密码: <span className="font-mono">admin123</span>
-          </p>
-        </div>
       </div>
     </div>
   )

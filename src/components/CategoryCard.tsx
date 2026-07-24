@@ -15,10 +15,10 @@ export const CategoryCard = ({ category }: CategoryCardProps) => {
   return (
     <Link
       to={`/categories/${category.id}`}
-      className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 group cursor-pointer"
+      className="bg-white rounded-xl shadow-card hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-300 p-3 group cursor-pointer"
     >
       <div className="flex flex-col items-center text-center">
-        <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors p-2 overflow-hidden">
+        <div className="w-12 h-12 bg-primary-50 group-hover:bg-primary-100 border border-primary-100/50 rounded-full flex items-center justify-center mb-2 transition-colors p-0.5 overflow-hidden">
           {showLogo ? (
             <img
               src={resolveImageUrl(category.logo)}
@@ -27,15 +27,12 @@ export const CategoryCard = ({ category }: CategoryCardProps) => {
               onError={() => setLogoError(true)}
             />
           ) : (
-            <span className="text-3xl font-bold text-primary">{category.name.charAt(0)}</span>
+            <span className="text-base font-bold text-primary-700">{category.name.charAt(0)}</span>
           )}
         </div>
-        <h3 className="text-lg font-semibold text-dark mb-2 group-hover:text-secondary transition-colors">
+        <h3 className="text-xs font-medium text-dark group-hover:text-secondary-500 transition-colors tracking-wide">
           {category.name}
         </h3>
-        <p className="text-sm text-gray-500 line-clamp-2">
-          {category.description}
-        </p>
       </div>
     </Link>
   )

@@ -3,6 +3,8 @@ export interface Category {
   name: string
   logo?: string
   description?: string
+  pinned?: boolean
+  pinnedAt?: string | null
   createdAt: string
   updatedAt: string
 }
@@ -15,6 +17,7 @@ export interface Product {
   price: number
   description?: string
   images: string[]
+  detailImages?: string[]
   specs?: string
   createdAt: string
   updatedAt: string
@@ -45,5 +48,6 @@ export interface ProductRequest {
   price: number
   description?: string
   images: string[]
+  detailImages?: string[]
   specs?: string
 }

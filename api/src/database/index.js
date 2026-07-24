@@ -33,6 +33,7 @@ const defaultProducts = [
     price: 2999,
     description: '智能恒温浴霸，集成照明、换气、取暖功能于一体，为您打造舒适的浴室体验。',
     images: ['/uploads/1784629557878-599012389-3.jpg'],
+    detailImages: [],
     specs: '功率: 2600W\n照明: 24W\n换气: 120m3/h\n尺寸: 300x600mm',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -45,6 +46,7 @@ const defaultProducts = [
     price: 3999,
     description: '高端智能浴霸，支持语音控制，一键开启舒适模式。',
     images: ['/uploads/1784629562500-370866613-5.jpg'],
+    detailImages: [],
     specs: '功率: 3000W\n照明: 36W\n换气: 150m3/h\n尺寸: 300x600mm\n语音控制: 支持',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -57,6 +59,7 @@ const defaultProducts = [
     price: 4599,
     description: '500升大容量变频冰箱，风冷无霜，智能控温。',
     images: ['/uploads/1784629888588-842271129-1.jpg'],
+    detailImages: [],
     specs: '容量: 500L\n能效等级: 一级\n制冷方式: 风冷\n控温方式: 电脑控温',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -69,6 +72,7 @@ const defaultProducts = [
     price: 5999,
     description: '3匹变频冷暖空调，节能静音，快速制冷制热。',
     images: ['/uploads/1784629891026-813402683-3.jpg'],
+    detailImages: [],
     specs: '匹数: 3匹\n能效等级: 一级\n变频: 是\n制冷量: 7200W',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -136,15 +140,31 @@ function persistSync() {
 const db = {
   categories: {
     getAll: async () => {
-      return [...categories].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      return [...categories]
+        .map(c => ({ pinned: false, pinnedAt: null, ...c }))
+        .sort((a, b) => {
+          // Pinned categories first
+          if (a.pinned && !b.pinned) return -1;
+          if (!a.pinned && b.pinned) return 1;
+          // Both pinned: sort by pinnedAt ascending (earlier pinned first)
+          if (a.pinned && b.pinned) {
+            return new Date(a.pinnedAt) - new Date(b.pinnedAt);
+          }
+          // Neither pinned: sort by createdAt descending (newest first)
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        });
     },
     getById: async (id) => {
-      return categories.find(c => c.id === id) || null;
+      const c = categories.find(c => c.id === id) || null;
+      if (!c) return null;
+      return { pinned: false, pinnedAt: null, ...c };
     },
     create: async (data) => {
       const category = {
         id: categoryIdCounter++,
         ...data,
+        pinned: false,
+        pinnedAt: null,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
@@ -171,10 +191,12 @@ const db = {
       if (categoryId) {
         result = result.filter(p => p.categoryId === categoryId);
       }
-      return result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      return result.map(p => ({ detailImages: [], ...p })).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     },
     getById: async (id) => {
-      return products.find(p => p.id === id) || null;
+      const p = products.find(p => p.id === id) || null;
+      if (!p) return null;
+      return { detailImages: [], ...p };
     },
     create: async (data) => {
       const product = {
@@ -204,7 +226,8 @@ const db = {
       return products.filter(p =>
         p.name.toLowerCase().includes(kw) ||
         (p.categoryName && p.categoryName.toLowerCase().includes(kw)) ||
-        (p.description && p.description.toLowerCase().includes(kw))
+        (p.description && p.description.toLowerCase().includes(kw)) ||
+        (p.specs && p.specs.toLowerCase().includes(kw))
       );
     },
   },

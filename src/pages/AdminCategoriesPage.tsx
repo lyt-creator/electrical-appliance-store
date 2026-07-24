@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, Edit2, Trash2, X, ImagePlus } from 'lucide-react'
+import { Plus, Edit2, Trash2, X, ImagePlus, Pin, PinOff } from 'lucide-react'
 import { categoryAPI, uploadAPI } from '../api'
 import { resolveImageUrl } from '../api'
 import { Category, CategoryRequest } from '../types'
@@ -88,6 +88,19 @@ export const AdminCategoriesPage = () => {
     }
   }
 
+  const handleTogglePin = async (category: Category) => {
+    try {
+      if (category.pinned) {
+        await categoryAPI.unpin(category.id)
+      } else {
+        await categoryAPI.pin(category.id)
+      }
+      fetchCategories()
+    } catch (error) {
+      console.error('顶置操作失败:', error)
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -97,7 +110,7 @@ export const AdminCategoriesPage = () => {
         </div>
         <button
           onClick={() => handleOpenModal()}
-          className="flex items-center space-x-1 sm:space-x-2 bg-primary text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors text-sm sm:text-base"
+          className="flex items-center space-x-1 sm:space-x-2 bg-primary-700 text-white px-3 sm:px-4 py-2 rounded-xl shadow-soft hover:bg-primary-800 transition-colors text-sm sm:text-base"
         >
           <Plus className="w-5 h-5" />
           <span>添加分类</span>
@@ -105,26 +118,27 @@ export const AdminCategoriesPage = () => {
       </div>
 
       {loading ? (
-        <div className="bg-white rounded-xl shadow-sm p-20 text-center">
+        <div className="bg-white rounded-2xl shadow-soft p-20 text-center">
           <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
         </div>
       ) : categories.length === 0 ? (
-        <div className="bg-white rounded-xl shadow-sm p-20 text-center text-gray-500">
+        <div className="bg-white rounded-2xl shadow-soft p-20 text-center text-gray-500">
           暂无分类
         </div>
       ) : (
         <>
           {/* Desktop: Table */}
-          <div className="hidden md:block bg-white rounded-xl shadow-sm overflow-hidden">
+          <div className="hidden md:block bg-white rounded-2xl shadow-soft hover:shadow-card-hover overflow-hidden transition-shadow">
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">ID</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Logo</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">名称</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">描述</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">创建时间</th>
-                  <th className="px-6 py-3 text-right text-sm font-semibold text-gray-600">操作</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">ID</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Logo</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">名称</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">描述</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">排序</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">创建时间</th>
+                  <th className="px-6 py-3 text-right text-sm font-medium text-gray-600">操作</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -146,15 +160,32 @@ export const AdminCategoriesPage = () => {
                     <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
                       {category.description}
                     </td>
+                    <td className="px-6 py-4">
+                      {category.pinned ? (
+                        <span className="inline-flex items-center space-x-1 bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full text-xs font-medium">
+                          <Pin className="w-3 h-3" />
+                          <span>顶置</span>
+                        </span>
+                      ) : (
+                        <span className="text-xs text-gray-400">普通</span>
+                      )}
+                    </td>
                     <td className="px-6 py-4 text-sm text-gray-500">
                       {new Date(category.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end space-x-2">
-                        <button onClick={() => handleOpenModal(category)} className="text-gray-500 hover:text-primary transition-colors">
+                        <button
+                          onClick={() => handleTogglePin(category)}
+                          className={`rounded-full p-2 transition-colors ${category.pinned ? 'text-orange-500 hover:bg-orange-50 hover:text-orange-600' : 'text-gray-400 hover:bg-gray-100 hover:text-orange-500'}`}
+                          title={category.pinned ? '取消顶置' : '顶置'}
+                        >
+                          {category.pinned ? <PinOff className="w-5 h-5" /> : <Pin className="w-5 h-5" />}
+                        </button>
+                        <button onClick={() => handleOpenModal(category)} className="rounded-full p-2 text-gray-500 hover:bg-gray-100 hover:text-primary transition-colors">
                           <Edit2 className="w-5 h-5" />
                         </button>
-                        <button onClick={() => handleDelete(category.id)} className="text-gray-500 hover:text-red-500 transition-colors">
+                        <button onClick={() => handleDelete(category.id)} className="rounded-full p-2 text-gray-500 hover:bg-gray-100 hover:text-red-500 transition-colors">
                           <Trash2 className="w-5 h-5" />
                         </button>
                       </div>
@@ -168,7 +199,7 @@ export const AdminCategoriesPage = () => {
           {/* Mobile: Cards */}
           <div className="md:hidden space-y-3">
             {categories.map((category) => (
-              <div key={category.id} className="bg-white rounded-xl shadow-sm p-4">
+              <div key={category.id} className="bg-white rounded-2xl shadow-soft hover:shadow-card-hover p-4 transition-shadow">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center space-x-3">
                     {category.logo ? (
@@ -186,10 +217,25 @@ export const AdminCategoriesPage = () => {
                 </div>
                 <p className="text-sm text-gray-500 mb-2 leading-relaxed">{category.description}</p>
                 <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                  <span className="text-xs text-gray-400">
-                    {new Date(category.createdAt).toLocaleDateString()}
-                  </span>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xs text-gray-400">
+                      {new Date(category.createdAt).toLocaleDateString()}
+                    </span>
+                    {category.pinned && (
+                      <span className="inline-flex items-center space-x-1 bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full text-xs font-medium">
+                        <Pin className="w-3 h-3" />
+                        <span>顶置</span>
+                      </span>
+                    )}
+                  </div>
                   <div className="flex items-center space-x-3">
+                    <button
+                      onClick={() => handleTogglePin(category)}
+                      className={`flex items-center space-x-1 text-sm ${category.pinned ? 'text-orange-500' : 'text-gray-400'}`}
+                    >
+                      {category.pinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}
+                      <span>{category.pinned ? '取消顶置' : '顶置'}</span>
+                    </button>
                     <button onClick={() => handleOpenModal(category)} className="flex items-center space-x-1 text-primary text-sm">
                       <Edit2 className="w-4 h-4" />
                       <span>编辑</span>
@@ -208,7 +254,7 @@ export const AdminCategoriesPage = () => {
 
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-elevated w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-6 border-b sticky top-0 bg-white z-10">
               <h2 className="text-xl font-semibold text-dark">
                 {editingCategory ? '编辑分类' : '添加分类'}
@@ -270,7 +316,7 @@ export const AdminCategoriesPage = () => {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
+                  className="flex-1 bg-primary-700 text-white px-4 py-2 rounded-xl hover:bg-primary-800 transition-colors"
                 >
                   {editingCategory ? '保存' : '添加'}
                 </button>

@@ -22,6 +22,8 @@ export const categoryAPI = {
   create: (data: CategoryRequest) => instance.post<Category>('/categories', data),
   update: (id: number, data: CategoryRequest) => instance.put<Category>(`/categories/${id}`, data),
   delete: (id: number) => instance.delete(`/categories/${id}`),
+  pin: (id: number) => instance.put<Category>(`/categories/${id}/pin`),
+  unpin: (id: number) => instance.put<Category>(`/categories/${id}/unpin`),
 }
 
 export const productAPI = {

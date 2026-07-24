@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import { Search, ArrowLeft } from 'lucide-react'
 import { productAPI } from '../api'
 import { Product } from '../types'
@@ -10,8 +10,11 @@ export const SearchPage = () => {
   const keyword = searchParams.get('q') || ''
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
+  const [searchInput, setSearchInput] = useState(keyword)
+  const navigate = useNavigate()
 
   useEffect(() => {
+    setSearchInput(keyword)
     const fetchProducts = async () => {
       if (!keyword.trim()) {
         setLoading(false)
@@ -29,6 +32,13 @@ export const SearchPage = () => {
     fetchProducts()
   }, [keyword])
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (searchInput.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchInput.trim())}`)
+    }
+  }
+
   return (
     <div className="min-h-screen py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -43,15 +53,19 @@ export const SearchPage = () => {
         </div>
 
         <div className="bg-white rounded-xl shadow-sm p-4 mb-8">
-          <form className="flex items-center" onSubmit={(e) => e.preventDefault()}>
+          <form className="flex items-center" onSubmit={handleSearch}>
             <Search className="w-5 h-5 text-gray-400 ml-4" />
             <input
               type="text"
-              defaultValue={keyword}
-              placeholder="搜索产品..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder="搜索产品名称、尺寸、规格..."
               className="flex-1 px-4 py-2 text-lg focus:outline-none"
             />
-            <button className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors font-medium">
+            <button
+              type="submit"
+              className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors font-medium"
+            >
               搜索
             </button>
           </form>
@@ -81,10 +95,10 @@ export const SearchPage = () => {
               <Search className="w-10 h-10 text-gray-400" />
             </div>
             <h3 className="text-xl font-semibold text-dark mb-2">未找到相关产品</h3>
-            <p className="text-gray-500 mb-4">尝试使用其他关键词搜索</p>
-            <button className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors">
+            <p className="text-gray-500 mb-4">尝试使用其他关键词搜索，如产品名称、品牌或规格</p>
+            <a href="/" className="inline-block bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors">
               返回首页
-            </button>
+            </a>
           </div>
         )}
       </div>

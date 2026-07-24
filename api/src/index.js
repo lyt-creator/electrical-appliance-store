@@ -137,7 +137,11 @@ app.put('/api/categories/:id', authMiddleware, async (req, res) => {
   const { name, logo, description } = req.body;
   if (!name) return res.status(400).json({ error: '分类名称不能为空' });
   try {
-    const category = await db.categories.update(id, { name, logo: logo || null, description: description || null });
+    const updateData = { name };
+    // Only update fields that are explicitly provided
+    if (logo !== undefined) updateData.logo = logo;
+    if (description !== undefined) updateData.description = description;
+    const category = await db.categories.update(id, updateData);
     if (!category) return res.status(404).json({ error: '分类不存在' });
     res.json(category);
   } catch (error) {
@@ -152,6 +156,28 @@ app.delete('/api/categories/:id', authMiddleware, async (req, res) => {
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: '删除分类失败: ' + error.message });
+  }
+});
+
+app.put('/api/categories/:id/pin', authMiddleware, async (req, res) => {
+  const id = parseInt(req.params.id);
+  try {
+    const category = await db.categories.update(id, { pinned: true, pinnedAt: new Date().toISOString() });
+    if (!category) return res.status(404).json({ error: '分类不存在' });
+    res.json(category);
+  } catch (error) {
+    res.status(500).json({ error: '顶置失败: ' + error.message });
+  }
+});
+
+app.put('/api/categories/:id/unpin', authMiddleware, async (req, res) => {
+  const id = parseInt(req.params.id);
+  try {
+    const category = await db.categories.update(id, { pinned: false, pinnedAt: null });
+    if (!category) return res.status(404).json({ error: '分类不存在' });
+    res.json(category);
+  } catch (error) {
+    res.status(500).json({ error: '取消顶置失败: ' + error.message });
   }
 });
 
@@ -177,7 +203,7 @@ app.get('/api/products/:id', async (req, res) => {
 });
 
 app.post('/api/products', authMiddleware, async (req, res) => {
-  const { name, categoryId, price, description, images, specs } = req.body;
+  const { name, categoryId, price, description, images, detailImages, specs } = req.body;
   if (!name || !categoryId || !price || !images || !Array.isArray(images)) {
     return res.status(400).json({ error: '缺少必填字段' });
   }
@@ -190,6 +216,7 @@ app.post('/api/products', authMiddleware, async (req, res) => {
       price,
       description: description || null,
       images,
+      detailImages: detailImages || [],
       specs: specs || null,
     });
     res.status(201).json(product);
@@ -200,7 +227,7 @@ app.post('/api/products', authMiddleware, async (req, res) => {
 
 app.put('/api/products/:id', authMiddleware, async (req, res) => {
   const id = parseInt(req.params.id);
-  const { name, categoryId, price, description, images, specs } = req.body;
+  const { name, categoryId, price, description, images, detailImages, specs } = req.body;
   if (!name || !categoryId || !price || !images || !Array.isArray(images)) {
     return res.status(400).json({ error: '缺少必填字段' });
   }
@@ -213,6 +240,7 @@ app.put('/api/products/:id', authMiddleware, async (req, res) => {
       price,
       description: description || null,
       images,
+      detailImages: detailImages || [],
       specs: specs || null,
     });
     if (!product) return res.status(404).json({ error: '产品不存在' });
